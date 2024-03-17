@@ -1,0 +1,46 @@
+version: "3.7"
+
+services:
+   nextdb:
+      image: postgres:latest
+      container_name: nextapp-db
+      restart: unless-stopped
+      volumes:
+         - postgre_data:/var/lib/postgresql/data
+      ports:
+         - 5455:5432
+      environment:
+         POSTGRES_DB: ${DATABASE_DB?Variable not set}
+         POSTGRES_USER: ${DATABASE_USER?Variable not set}
+         POSTGRES_PASSWORD: ${DATABASE_PASS?Variable not set}
+         TZ: "Asia/Jakarta"
+
+   redis:
+      image: redis:latest
+      container_name: nextapp-redis
+      ports:
+         - '6380:6380' 
+      restart: unless-stopped
+      command: redis-server --port 6380 
+      expose:
+         - '6380'
+
+   nextapp:
+      build: 
+         context: .
+         dockerfile: ./Dockerfile.dev
+      container_name: nextapp
+      env_file:
+         - .env
+      volumes:
+         - ./:/app
+      restart: unless-stopped
+      ports:
+         - 3000:3000
+
+volumes:
+   postgre_data:
+
+networks:
+   default:
+      name: 'nextapp-net'
