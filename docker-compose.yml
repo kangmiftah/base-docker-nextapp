@@ -21,25 +21,29 @@ services:
       ports:
          - '6380:6380' 
       restart: unless-stopped
-      command: redis-server --port 6380 
+      command: redis-server --port 6380 --requirepass ${REDIS_PASS?Variable not set}
       expose:
          - '6380'
+      volumes: 
+         - cache:/data
 
-   nextapp:
-      build: 
-         context: .
-         dockerfile: ./Dockerfile.dev
-      container_name: nextapp
-      env_file:
-         - .env
-      volumes:
-         - ./:/app
-      restart: unless-stopped
-      ports:
-         - 3000:3000
+   # nextapp:
+   #    build: 
+   #       context: .
+   #       dockerfile: ./Dockerfile.dev
+   #    container_name: nextapp
+   #    volumes:
+   #       - ./:/nextapp
+   #    restart: unless-stopped  
+   #    env_file:
+   #       - .env
+   #    ports:
+   #       - 3000:3000
 
 volumes:
    postgre_data:
+   cache:
+      driver: local
 
 networks:
    default:
